@@ -1,0 +1,174 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Contents</title>
+  <meta name="description" content="Lecture notes for APPM 5530.">
+
+  <link rel="stylesheet" href="css/tufte.css">
+
+  <!--for nodes of tree diagram-->
+  <style> 
+	.node circle {
+	fill: #fff;
+	stroke: steelblue;
+	stroke-width: 2px;
+	}
+
+.	node text {
+	font: 12px sans-serif;
+	}
+
+	.link {
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 2px;
+	}
+</style>
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not--><link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'><!-- Load up MathJax script if needed ... specify in /_data/options.yml file--><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML"></script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-75587219-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+
+  <link rel="canonical" href="https://ermongroup.github.io/cs228-notes/">
+  <link rel="alternate" type="application/rss+xml" title="Probabilistic graphical modeling course" href="https://ermongroup.github.io/cs228-notes/feed.xml" />
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+
+
+    <article class="group">
+
+
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      Macros: {
+        e: "\\epsilon",
+        xti: "x^{(i)}",
+        yti: "y^{(i)}",
+        bfy: "{\\bf y}",
+        bfx: "{\\bf x}",
+        bfg: "{\\bf g}",
+        bfbeta: "{\\bf \\beta}",
+        tp: "\\tilde p",
+        pt: "p_\\theta",
+        E: "{\\mathbb{E}}",
+        Ind: "{\\mathbb{I}}",
+        KL: "{\\mathbb{KL}}",
+        Re: "{\\mathbb{R}}",
+        Dc: "{\\mathcal{D}}",
+        Tc: "{\\mathcal{T}}",
+        Xc: "{\\mathcal{X}}",
+        note: ["\\textcolor{blue}{[NOTE: #1]}",1]
+      }
+    }
+  });
+</script>
+
+
+
+
+<h2 id="counting">Counting</h2>
+
+<div id="factorials" style="color:green";><h2nonit>Things in a Row</h2nonit></div>
+
+<p>How many different ways can you list the integers 1 through 4 in various orders? Two examples are</p>
+<center>
+<p>
+3 &nbsp 2 &nbsp 1 &nbsp 4  &nbsp &nbsp and &nbsp &nbsp 2 &nbsp 4 &nbsp 1 &nbsp 3 ,
+</p>
+</center>
+
+<br>
+<p>but there are obviously many more possibilities.</p>
+
+<br>
+<p>The first number in the list can be 1 or 2 or 3 or 4. Let's visualize them as branches of a tree.</p>
+
+<!-- load the d3.js library and then run tree script-->	
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script type="text/javascript" src="js/tree.js"></script>
+</article>
+
+
+<article>
+<p>If we start our list with 1, for example, the next number can be 2 or 3 or 4. If we start our list with 2, 
+the next number can be one of 1 or 3 or 4. In general, possibilities for ``next numbers",  can be envisioned like this
+Following any path from top to bottom will give a different configuration of the numbers 1, 2, 3, and 4 and all 
+possible configurations are shown. There are 4 branches at the top. Each has 3 offshoots, making 
+\(4 \times 3 = 12\) "second level branches". Each of those has 2 offshoots, making \(4 \times 3 \times 2=24\)
+"third level branches" and finally, each of those has one final offshoot making 
+\(4 \times 3 \times 2 \times 1 = 24\) total branches representing configurations of 1, 2, 3,
+and 4. Of course, we do not need to multiply by 1, but it gives a nice sense of completeness 
+don't you think?
+</p>
+
+
+<div style="background-color: #cdd8e1; color: #284b68; border: solid 2px #284b68; border-radius: 1em; margin: 2em; padding: 1em;">
+<center><h3box><p style="line-height:120%; font-size:100%;"> 
+For any positive integer \(n\), the symbol "\(n!\)" is read as "<b>n factorial</b>" and is defined as
+$$
+n! := n (n-1) (n-2) \cdots (2)(1).
+$$
+
+By convention (so that all will be right with the world and so that certain generalizations will go smoothly) we define \(0!:=1\).
+</p></h3box></center></div>
+
+<p>From the tree diagram above, we have seen that the number of ways to arrange 4 distinct 
+numbers  (or people, objects, or "things") is \(4!=(4)(3)(2)(1)=24\).
+</p>
+
+<div style="background-color: #cdd8e1; color: #284b68; border: solid 2px #284b68; border-radius: 1em; margin: 2em; padding: 1em;">
+<center><h3box><p style="line-height:120%; font-size:100%;"> 
+In general,
+$$
+n! = \mbox{the number of ways to arrange \(n\) distinct objects.}
+$$
+</p></h3box></center></div>
+
+<p>
+From our little tree drawing experiment, we have learned at least two other things. First, 
+if the numbers can be "reused", the number of branches will not decrease. For example, if we 
+roll a fair 6-sided die 4 times we could see outcomes like
+$$
+3 \,\,\,\, 5 \,\,\,\, 3 \,\,\,\, 4  \qquad \mbox{and}  \qquad 2 \,\,\,\, 1 \,\,\,\, 1 \,\,\,\, 1 .
+$$
+The total number of possible outcomes will be 6 (first branches) times 6 (second branches) times 
+6 (third branches) times 6 (fourth branches), for a total of \(6^{4} = 1296\) possible outcomes. 
+
+At this point we could make another fancy box saying something like: 
+"If we perform an experiment with \(k\) trials and with \(n\) possible outcomes for each trial, 
+we have a total of \(n^{k}\) possible outcomes for the entire experiment."  However, 
+<b>we won't and you shouldn't either</b>.  If you are memorizing things for a math class 
+(outside of definitions), the class will get more and more and more difficult as you pile up 
+information in your head and eventually struggle to access it.  If you are memorizing things 
+for a math class, you are going to be thrown off when problems have only subtle differences 
+from ones you've already seen or solved. On the other hand, if you <b>understand</b> and think 
+about what you're doing at each step, the class will get easier and easier even as the material 
+gets more complex! 
+</p>
+
+<br><br>
+<div id="combinations" style="color:green";><h2nonit>Choosing Things: Order is Important</h2nonit></div>
+
+
+</article>
+
+
+
+
+
+  </body>
+</html>
